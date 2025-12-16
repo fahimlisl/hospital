@@ -7,7 +7,6 @@ const historyCheck = new mongoose.Schema(
     },
     age: {
       type: Number,
-      // required: true,
     },
     isSubmitted: {
       type: Boolean,
