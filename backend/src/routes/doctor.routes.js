@@ -1,5 +1,6 @@
 import {Router} from "express"
-import { loginDoctor, registerDoctor } from "../controllers/doctor.controllers.js"
+import { addVisit, loginDoctor, registerDoctor } from "../controllers/doctor.controllers.js"
+import { verifyJWT } from "../middlewares/auth.middlewares.js"
 
 
 const router = Router()
@@ -8,5 +9,8 @@ const router = Router()
 
 router.route("/register").post(registerDoctor)
 router.route("/login").post(loginDoctor)
+
+// patient 
+router.route("/addVisit/:id").post(verifyJWT,addVisit)
 
 export default router

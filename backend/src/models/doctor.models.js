@@ -56,6 +56,7 @@ doctorSchema.methods.generateAccessToken = function () {
       _id: this._id,
       email: this.email,
       phoneNumber: this.phoneNumber,
+      role:"doctor"
     },
     process.env.ACCESS_TOKEN,
     {

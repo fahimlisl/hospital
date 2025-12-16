@@ -28,13 +28,13 @@ const addPatient = asyncHandler(async(req,res) => {
     }
     const setpP = await Step.create({
         patient:createUser._id,
-        stepFirst:[
-            {
-                age,
-                purpose
+        // stepFirst:[
+        //     {
+        //         age,
+        //         purpose
 
-            }
-        ]
+        //     }
+        // ]
     })
 
     if(!setpP){

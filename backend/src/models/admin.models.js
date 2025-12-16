@@ -50,6 +50,7 @@ adminSchema.methods.generateAccessToken = function () {
       _id: this._id,
       username: this.username,
       email: this.email,
+      role:"admin"
     },
     process.env.ACCESS_TOKEN,
     {

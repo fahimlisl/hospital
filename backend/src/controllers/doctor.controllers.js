@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { Doctor } from "../models/doctor.models.js";
 import { options } from "../utils/options.js";
 import generateAccessAndRefreshToken from "../utils/generateA&RT.js";
+import { Step } from "../models/step.models.js";
 
 
 const registerDoctor = asyncHandler( async(req,res) => {
@@ -70,11 +71,38 @@ const loginDoctor = asyncHandler( async(req,res) => {
     .json(
         new ApiResponse(
             200,
-            foundUser,
+            {accessToken,refreshToken},
             "Doctor Login Successful"
         )
     )
 })
 
 
-export {loginDoctor,registerDoctor}
+const logOutDoctor = asyncHandler(async(req,res)=> {})
+
+
+const addVisit = asyncHandler(async (req,res) => {
+    const id = req.params.id;
+    const added = await Step.findOneAndUpdate({ patient: id },
+        {
+            $push:{
+                visits:{}
+            }
+        },
+        {
+            new:true
+        }
+    )
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            added,
+            "new visit added successfully"
+        )
+    )
+})
+
+export {loginDoctor,registerDoctor,logOutDoctor,addVisit}

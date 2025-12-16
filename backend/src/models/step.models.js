@@ -75,8 +75,9 @@ const convergence = new mongoose.Schema(
   { timestamps: true }
 );
 
-const stepSchema = new mongoose.Schema({
-  stepFirst: {
+
+const repeateSchema = new mongoose.Schema({
+    stepFirst: {
     type: [historyCheck],
     default: () => [
       {
@@ -131,6 +132,25 @@ const stepSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+},{timestamps:true})
+
+
+const stepSchema = new mongoose.Schema({
+  patient: {
+    type: Schema.Types.ObjectId,
+    ref: "Patient",
+  },
+  // isCompleted: {
+  //   type: Boolean,
+  //   default: false,
+  // },
+  visits:{
+    type:[repeateSchema],
+    default:() => [{}],
+  }
 });
 
 export const Step = mongoose.model("Step", stepSchema);
+
+
+// for now experimental purpose , keeping the purpose same and fixed , will add conclusion of treatment at the end , 
