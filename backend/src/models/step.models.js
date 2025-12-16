@@ -1,60 +1,137 @@
 import mongoose, { Schema } from "mongoose";
 
-const stepOne = new mongoose.Schema({
-    powerOne:{
-        type:Number,
-        default:0
+const historyCheck = new mongoose.Schema(
+  {
+    purpose: {
+      type:String
     },
-    powerTwo:{
-        type:Number,
-        default:0
+    age: {
+      type: Number,
+      // required: true,
     },
-    isSubmitted:{
-        type:Boolean,
-        default:false
-    }
-},{timestamps:true})
+    isSubmitted: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { timestamps: true }
+);
 
-const stepTwo = new mongoose.Schema({
-    powerThree:{
-        type:Number
+const visionCheckSecond = new mongoose.Schema(
+  {
+    distanceVision: {
+      type: Boolean,
+      default: false,
     },
-    powerFour:{
-        type:Number
+    nearVision: {
+      type: Boolean,
+      default: false,
     },
-    isSubmitted:{
-        type:Boolean,
-        default:false
-    }
-},{
-    timestamps:true
-})
+    isSubmitted: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const torchlight = new mongoose.Schema(
+  {
+    normality: {
+      type: Boolean,
+      default: false, // flase -> not normal , true -> normal
+    },
+    isSubmitted: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { timestamps: true }
+);
+
+const coverUncover = new mongoose.Schema({
+  normality: {
+    type: Boolean,
+    default: false,
+  },
+  isSubmitted: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+const convergence = new mongoose.Schema(
+  {
+    normality: {
+      type: Boolean,
+      default: false,
+    },
+    isSubmitted: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { timestamps: true }
+);
 
 const stepSchema = new mongoose.Schema({
   stepFirst: {
-    type: [stepOne],
-    default: () => [{
-      powerOne: 0,
-      powerTwo: 0,
-      isSubmitted: false
-    }]
+    type: [historyCheck],
+    default: () => [
+      {
+        purpose:"",
+        age:0,
+        isSubmitted: false,
+      },
+    ],
   },
   stepSecond: {
-    type:[stepTwo],
-    default: () => [{
-        powerFour:0,
-        powerThree:0,
-        isSubmitted:false
-    }]
+    type: [visionCheckSecond],
+    default: () => [
+      {
+        distanceVision: false,
+        nearVision: false,
+        isSubmitted: false,
+      },
+    ],
+  },
+  stepThird: {
+    type: [torchlight],
+    default: () => [
+      {
+        normality: false,
+        isSubmitted: false,
+      },
+    ],
+  },
+  stepFourth: {
+    type: [coverUncover],
+    default: () => [
+      {
+        normality: false,
+        isSubmitted: false,
+      },
+    ],
+  },
+  stepFive: {
+    type: [convergence],
+    default: () => [
+      {
+        normality: false,
+        isSubmitted: false,
+      },
+    ],
   },
   patient: {
     type: Schema.Types.ObjectId,
-    ref: "Patient"
+    ref: "Patient",
   },
   isCompleted: {
     type: Boolean,
-    default: false
-  }
-})
+    default: false,
+  },
+});
 
-export const Step = mongoose.model("Step",stepSchema)
+export const Step = mongoose.model("Step", stepSchema);

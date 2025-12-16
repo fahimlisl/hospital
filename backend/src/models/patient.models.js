@@ -19,6 +19,10 @@ const patientSchema = new mongoose.Schema({
     steps:{
         type: Schema.Types.ObjectId,
         ref:"Step"
+    },
+    age:{
+        type:Number,
+        required:true
     }
 },{timestamps:true})
 
