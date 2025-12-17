@@ -40,7 +40,3 @@ export const verifyJWT = async (req, _, next) => {
     throw new ApiError(401, error.message || "Invalid token");
   }
 };
-
-
-
-// have to make this is generalize

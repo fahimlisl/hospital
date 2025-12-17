@@ -28,13 +28,13 @@ const addPatient = asyncHandler(async(req,res) => {
     }
     const setpP = await Step.create({
         patient:createUser._id,
-        // stepFirst:[
-        //     {
-        //         age,
-        //         purpose
-
-        //     }
-        // ]
+        visits:[
+            {
+                purpose:{
+                    value:purpose
+                }
+            }
+        ]
     })
 
     if(!setpP){
@@ -58,7 +58,12 @@ const addPatient = asyncHandler(async(req,res) => {
 
     const finalUser = await Patient.findById(createUser._id).populate("steps")
 
-    // add a vlaiditon , if somehwo the creation gives error ,the whole docuemtn of patient should be deleted 
+
+    if(!finalUser){
+        await Patient.findByIdAndDelete(createUser._id)
+        await Step.findOneAndDelete({patient:createUser._id})
+        throw new ApiError(500,"failed to create patient")
+    }
 
     return res
     .status(200)

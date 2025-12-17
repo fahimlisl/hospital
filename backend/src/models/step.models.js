@@ -1,10 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-const historyCheck = new mongoose.Schema(
-  {
-    purpose: {
-      type:String
-    },
+const historyCheck = new mongoose.Schema({
     age: {
       type: Number,
     },
@@ -75,13 +71,22 @@ const convergence = new mongoose.Schema(
   { timestamps: true }
 );
 
+const purposeSchema = new mongoose.Schema({
+  value: {
+      type: String,
+      required: true,
+    },
+},{timestamps:true})
 
 const repeateSchema = new mongoose.Schema({
-    stepFirst: {
+  purpose:{
+    type:purposeSchema,
+    required:true
+  },
+  stepFirst: {
     type: [historyCheck],
     default: () => [
       {
-        purpose:"",
         age:0,
         isSubmitted: false,
       },
@@ -140,10 +145,10 @@ const stepSchema = new mongoose.Schema({
     type: Schema.Types.ObjectId,
     ref: "Patient",
   },
-  // isCompleted: {
-  //   type: Boolean,
-  //   default: false,
-  // },
+  isCompleted: {
+    type: Boolean,
+    default: false,
+  },
   visits:{
     type:[repeateSchema],
     default:() => [{}],

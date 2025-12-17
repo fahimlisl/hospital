@@ -82,11 +82,14 @@ const logOutDoctor = asyncHandler(async(req,res)=> {})
 
 
 const addVisit = asyncHandler(async (req,res) => {
+    const {purpose} = req.body;
     const id = req.params.id;
     const added = await Step.findOneAndUpdate({ patient: id },
         {
             $push:{
-                visits:{}
+                visits:{
+                    purpose: { value: purpose },
+                },
             }
         },
         {
