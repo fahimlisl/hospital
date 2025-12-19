@@ -90,44 +90,38 @@ const logOutDoctor = asyncHandler(async (req, res) => {
   );
 
   return res
-  .status(200)
-  .clearCookie("refreshToken",options)
-  .clearCookie("accessToken",options)
-  .json(
-    new ApiResponse(
-        200,
-        {},
-        "User Logged Out successfully"
-    )
-  )
+    .status(200)
+    .clearCookie("refreshToken", options)
+    .clearCookie("accessToken", options)
+    .json(new ApiResponse(200, {}, "User Logged Out successfully"));
 });
 
-const removeDoctor = asyncHandler(async(req,res) => {
+const removeDoctor = asyncHandler(async (req, res) => {
   const docotrId = req.params.id;
-  if(!docotrId) throw new ApiError(400,"kindly provide proper docotr id ")
-  const deleteTED = await Doctor.findByIdAndDelete(docotrId)
-  if(!deleteTED) throw new ApiError(500,"wasn't able to delte docotor")
+  if (!docotrId) throw new ApiError(400, "kindly provide proper docotr id ");
+  const deleteTED = await Doctor.findByIdAndDelete(docotrId);
+  if (!deleteTED) throw new ApiError(500, "wasn't able to delte docotor");
   return res
-  .status(200)
-  .json(
-    new ApiResponse(
-      200,
-      {},
-      "doctor deleted successfully"
-    )
-  )
-})
-
+    .status(200)
+    .json(new ApiResponse(200, {}, "doctor deleted successfully"));
+});
 
 const addVisit = asyncHandler(async (req, res) => {
   const { purpose } = req.body;
   const id = req.params.id;
+  const pp = await Step.findOne({ patient: id });
+  const prevAge = pp.visits[0].stepFirst[0].age;
   const added = await Step.findOneAndUpdate(
     { patient: id },
     {
       $push: {
         visits: {
           purpose: { value: purpose },
+          stepFirst: [
+            {
+              age: prevAge,
+            },
+          ],
         },
       },
     },
@@ -141,238 +135,190 @@ const addVisit = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, added, "new visit added successfully"));
 });
 
-
 // will filter patients by name or phonenumber via frontend
-const fetchAllPatient = asyncHandler( async(req,res) => {
-    const allPatient = await Patient.find({})
-    // will add validation later if needed
-    return res
+const fetchAllPatient = asyncHandler(async (req, res) => {
+  const allPatient = await Patient.find({});
+  // will add validation later if needed
+  return res
     .status(200)
     .json(
-        new ApiResponse(
-            200,
-            allPatient,
-            "successFully fetched all patients"
-        )
-    )
-})
+      new ApiResponse(200, allPatient, "successFully fetched all patients")
+    );
+});
 
-
-const fetchAllVisit = asyncHandler(async(req,res) => {
-    const patientId = req.params.id;
-    const patient  = await Patient.findById(patientId)
-    .populate("steps")
-    // .select("-fullName -email -DOB -age -phoneNumber"); // according to need , will get these detials also
-    if(!patient) throw new ApiError(400,"failed to find patient")
-    return res
+const fetchAllVisit = asyncHandler(async (req, res) => {
+  const patientId = req.params.id;
+  const patient = await Patient.findById(patientId).populate("steps");
+  // .select("-fullName -email -DOB -age -phoneNumber"); // according to need , will get these detials also
+  if (!patient) throw new ApiError(400, "failed to find patient");
+  return res
     .status(200)
-    .json(
-        new ApiResponse(
-            200,
-            patient,
-            "fetched Patient Successfully"
-        )
-    )
-})
-
+    .json(new ApiResponse(200, patient, "fetched Patient Successfully"));
+});
 
 // api endpoints for editing feilds
 
-const firstStepEdit = asyncHandler(async(req,res) => {
-    const patientId = req.params.id;
-    await Step.findOneAndUpdate(
-        {
-            patient:patientId
-        },
-        {
-            $set:{
-              "visits.$[visit].stepFirst.$[step].isSubmitted":true,
-            }
-        },
-        {
-          arrayFilters: [
-        { "visit.isCompleted": false },
-        { "step.isSubmitted": false }
-      ],
-          new:true
-        }
-    )
-
-    return res
-    .status(
-      200
-    ).json(
-      new ApiResponse(
-        200,
-        {},
-        "edited succesfully"
-      )
-    )
-})
-
-const secondStepEdit = asyncHandler(async(req,res) => {
+const firstStepEdit = asyncHandler(async (req, res) => {
   const patientId = req.params.id;
-  const {distanceVision,nearVision} = req.body
-  console.log(distanceVision)
   await Step.findOneAndUpdate(
     {
-      patient:patientId
+      patient: patientId,
     },
     {
-      $set:{
-        "visits.$[visit].stepSecond.$[variable].distanceVision" : distanceVision, 
-        // ture or flase , should be taken from forntend
-        "visits.$[visit].stepSecond.$[variable].nearVision" : nearVision,
-        "visits.$[visit].stepSecond.$[variable].isSubmitted" : true,
-      }
+      $set: {
+        "visits.$[visit].stepFirst.$[step].isSubmitted": true,
+      },
     },
-    {arrayFilters:[
+    {
+      arrayFilters: [
+        { "visit.isCompleted": false },
+        { "step.isSubmitted": false },
+      ],
+      new: true,
+    }
+  );
+
+  return res.status(200).json(new ApiResponse(200, {}, "edited succesfully"));
+});
+
+const secondStepEdit = asyncHandler(async (req, res) => {
+  const patientId = req.params.id;
+  const { distanceVision, nearVision } = req.body;
+  console.log(distanceVision);
+  await Step.findOneAndUpdate(
+    {
+      patient: patientId,
+    },
+    {
+      $set: {
+        "visits.$[visit].stepSecond.$[variable].distanceVision": distanceVision,
+        // ture or flase , should be taken from forntend
+        "visits.$[visit].stepSecond.$[variable].nearVision": nearVision,
+        "visits.$[visit].stepSecond.$[variable].isSubmitted": true,
+      },
+    },
+    {
+      arrayFilters: [
         { "visit.isCompleted": false },
         // { "variable.isSubmitted": !distanceVision },
-        { "variable.isSubmitted": false }, 
+        { "variable.isSubmitted": false },
         // for now will just save one time then can update for toggle accoriding to frontend
       ],
-      new:true
-  }
-  )
-
-  return res
-  .status(200)
-  .json(
-    new ApiResponse(
-      200,
-      {},
-      "second field updated"
-    )
-  )
-})
-
-
-const stepThirdEdit = asyncHandler(async(req,res) => {
-  const patientId = req.params.id;
-  const {normality,isSubmitted} = req.body;
-  await Step.findOneAndUpdate(
-    {
-      patient:patientId
-    },
-    {
-      $set:{
-        "visits.$[visit].stepThird.$[step].normality":normality,
-        "visits.$[visit].stepThird.$[step].isSubmitted":isSubmitted
-      }
-    },
-    {
-      arrayFilters:[
-        {"visit.isCompleted":false},
-        {"step.isSubmitted": false}
-      ]
+      new: true,
     }
-  )
+  );
 
-  return res
-  .status(200)
-  .json(
-    new ApiResponse(
-      200,
-      {},
-      "fileds updated successfully"
-    )
-  )
-})
+  return res.status(200).json(new ApiResponse(200, {}, "second field updated"));
+});
 
-const stepFourthEdit = asyncHandler(async(req,res) => {
+const stepThirdEdit = asyncHandler(async (req, res) => {
   const patientId = req.params.id;
-  const {normality,isSubmitted} = req.body;
+  const { normality, isSubmitted } = req.body;
   await Step.findOneAndUpdate(
     {
-      patient:patientId
+      patient: patientId,
     },
     {
-      $set:{
-        "visits.$[visit].stepFourth.$[step].normality":normality,
-        "visits.$[visit].stepFourth.$[step].isSubmitted":true, 
-      }
+      $set: {
+        "visits.$[visit].stepThird.$[step].normality": normality,
+        "visits.$[visit].stepThird.$[step].isSubmitted": isSubmitted,
+      },
     },
     {
-      arrayFilters:[
-        {"visit.isCompleted":false},
-        {"step.isSubmitted": false}
+      arrayFilters: [
+        { "visit.isCompleted": false },
+        { "step.isSubmitted": false },
       ],
-      new:true
     }
-  )
+  );
 
   return res
-  .status(200)
-  .json(
-    new ApiResponse(
-      200,
-      {},
-      "updated step four successfully"
-    )
-  )
-})
+    .status(200)
+    .json(new ApiResponse(200, {}, "fileds updated successfully"));
+});
 
-
-const stepFiveEdit = asyncHandler(async(req,res) => {
+const stepFourthEdit = asyncHandler(async (req, res) => {
   const patientId = req.params.id;
-  const {normality,isSubmitted} = req.body;
+  const { normality, isSubmitted } = req.body;
   await Step.findOneAndUpdate(
     {
-      patient:patientId,
+      patient: patientId,
     },
     {
-      $set:{
-        "visits.$[visit].stepFive.$[step].normality":normality,
-        "visits.$[visit].stepFive.$[step].isSubmitted":true, 
-      }
+      $set: {
+        "visits.$[visit].stepFourth.$[step].normality": normality,
+        "visits.$[visit].stepFourth.$[step].isSubmitted": true,
+      },
     },
     {
-      arrayFilters:[
-        {"visit.isCompleted":false},
-        {"step.isSubmitted": false}
+      arrayFilters: [
+        { "visit.isCompleted": false },
+        { "step.isSubmitted": false },
       ],
-      new:true
+      new: true,
     }
-  )
+  );
 
   return res
-  .status(200)
-  .json(
-    new ApiResponse(
-      200,
-      {},
-      "updated step Five successfully"
-    )
-  )
-})
+    .status(200)
+    .json(new ApiResponse(200, {}, "updated step four successfully"));
+});
 
+const stepFiveEdit = asyncHandler(async (req, res) => {
+  const patientId = req.params.id;
+  const { normality, isSubmitted } = req.body;
+  await Step.findOneAndUpdate(
+    {
+      patient: patientId,
+    },
+    {
+      $set: {
+        "visits.$[visit].stepFive.$[step].normality": normality,
+        "visits.$[visit].stepFive.$[step].isSubmitted": true,
+      },
+    },
+    {
+      arrayFilters: [
+        { "visit.isCompleted": false },
+        { "step.isSubmitted": false },
+      ],
+      new: true,
+    }
+  );
 
-const finalSubmit = asyncHandler(async(req,res) => {
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "updated step Five successfully"));
+});
+
+const finalSubmit = asyncHandler(async (req, res) => {
   const patientId = req.params.id;
   await Step.findOneAndUpdate(
     {
-      patient:patientId
+      patient: patientId,
     },
     {
-      $set:{
-        isCompleted:true
-      }
+      $set: {
+        isCompleted: true,
+      },
     }
-  )
+  );
 
   return res
-  .status(200)
-  .json(
-    new ApiResponse(
-      200,
-      {},
-      "final submission successful"
-    )
-  )
-})
+    .status(200)
+    .json(new ApiResponse(200, {}, "final submission successful"));
+});
 
-export { loginDoctor, registerDoctor, logOutDoctor, removeDoctor}
+export { loginDoctor, registerDoctor, logOutDoctor, removeDoctor };
 
-
-export { addVisit ,fetchAllVisit , fetchAllPatient , firstStepEdit , secondStepEdit , stepThirdEdit , stepFourthEdit ,stepFiveEdit , finalSubmit};
+export {
+  addVisit,
+  fetchAllVisit,
+  fetchAllPatient,
+  firstStepEdit,
+  secondStepEdit,
+  stepThirdEdit,
+  stepFourthEdit,
+  stepFiveEdit,
+  finalSubmit,
+};
