@@ -133,7 +133,7 @@ const repeateSchema = new mongoose.Schema({
     type: Schema.Types.ObjectId,
     ref: "Patient",
   },
-  isCompleted: {
+  isCompleted: { // have to remove this , cuz this has no fucntion till now
     type: Boolean,
     default: false,
   },

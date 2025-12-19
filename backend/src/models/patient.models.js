@@ -7,7 +7,7 @@ const patientSchema = new mongoose.Schema({
     },
     phoneNumber:{
         type:Number,
-        // required:true // maybe have to change to flase , 
+        required:true // maybe have to change to flase , 
     },
     email:{
         type:String,

@@ -5,107 +5,374 @@ import { Doctor } from "../models/doctor.models.js";
 import { options } from "../utils/options.js";
 import generateAccessAndRefreshToken from "../utils/generateA&RT.js";
 import { Step } from "../models/step.models.js";
+import { Patient } from "../models/patient.models.js";
 
+const registerDoctor = asyncHandler(async (req, res) => {
+  const { phoneNumber, email, fullName, department, qualification, password } =
+    req.body;
 
-const registerDoctor = asyncHandler( async(req,res) => {
-    const {phoneNumber,email,fullName,department,qualification,password} = req.body;
+  if (
+    [phoneNumber, email, fullName, department, qualification, password].some(
+      (t) => !t && t !== 0
+    )
+  ) {
+    throw new ApiError(400, "All feilds are required");
+  }
 
-    if ([phoneNumber,email,fullName,department,qualification,password].some((t) => !t && t !== 0 )) {
-        throw new ApiError(400,"All feilds are required")
+  const checkExistance = await Doctor.findOne({
+    $or: [{ email }, { phoneNumber }],
+  });
+
+  if (checkExistance) throw new ApiError(400, "Doctor already exits");
+
+  const createdDoctor = await Doctor.create({
+    email,
+    phoneNumber,
+    department,
+    qualification,
+    fullName,
+    password,
+  });
+
+  if (!createdDoctor)
+    throw new ApiError(400, "fialed to create Docotr , chceck bakcend");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, createdDoctor, "doctor created Successfully"));
+});
+
+const loginDoctor = asyncHandler(async (req, res) => {
+  const { phoneNumber, email, password } = req.body;
+  const foundUser = await Doctor.findOne({
+    $or: [{ email }, { phoneNumber }],
+  });
+
+  if (!foundUser) {
+    throw new ApiError(400, "Doctor was not added");
+  }
+
+  const checkPassord = await foundUser.isPasswordCorrect(password);
+
+  if (!checkPassord)
+    throw new ApiError(401, "invalid crednetials , password incorrect");
+
+  const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+    foundUser._id,
+    Doctor
+  );
+
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+      new ApiResponse(
+        200,
+        { accessToken, refreshToken },
+        "Doctor Login Successful"
+      )
+    );
+});
+
+const logOutDoctor = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const user = await Doctor.findByIdAndUpdate(
+    userId,
+    {
+      $unset: {
+        refreshToken: "",
+      },
+    },
+    {
+      new: true,
     }
+  );
 
-    const checkExistance = await Doctor.findOne({
-        $or:[
-            {email},{phoneNumber}
-        ]
-    })
+  return res
+  .status(200)
+  .clearCookie("refreshToken",options)
+  .clearCookie("accessToken",options)
+  .json(
+    new ApiResponse(
+        200,
+        {},
+        "User Logged Out successfully"
+    )
+  )
+});
 
-    if (checkExistance) throw new ApiError(400,"Doctor already exits")
+const removeDoctor = asyncHandler(async(req,res) => {
+  const docotrId = req.params.id;
+  if(!docotrId) throw new ApiError(400,"kindly provide proper docotr id ")
+  const deleteTED = await Doctor.findByIdAndDelete(docotrId)
+  if(!deleteTED) throw new ApiError(500,"wasn't able to delte docotor")
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(
+      200,
+      {},
+      "doctor deleted successfully"
+    )
+  )
+})
 
 
-    const createdDoctor = await Doctor.create({
-        email,
-        phoneNumber,
-        department,
-        qualification,
-        fullName,
-        password
-    })
+const addVisit = asyncHandler(async (req, res) => {
+  const { purpose } = req.body;
+  const id = req.params.id;
+  const added = await Step.findOneAndUpdate(
+    { patient: id },
+    {
+      $push: {
+        visits: {
+          purpose: { value: purpose },
+        },
+      },
+    },
+    {
+      new: true,
+    }
+  );
 
-    if(!createdDoctor) throw new ApiError(400,"fialed to create Docotr , chceck bakcend")
+  return res
+    .status(200)
+    .json(new ApiResponse(200, added, "new visit added successfully"));
+});
 
+
+// will filter patients by name or phonenumber via frontend
+const fetchAllPatient = asyncHandler( async(req,res) => {
+    const allPatient = await Patient.find({})
+    // will add validation later if needed
     return res
     .status(200)
     .json(
         new ApiResponse(
             200,
-            createdDoctor,
-            "doctor created Successfully"
+            allPatient,
+            "successFully fetched all patients"
         )
     )
-    
 })
 
-const loginDoctor = asyncHandler( async(req,res) => {
-    const {phoneNumber,email,password} = req.body;
-    const foundUser = await Doctor.findOne({
-        $or:[
-            {email},{phoneNumber}
-        ]
-    })
 
-    if (!foundUser) {
-        throw new ApiError(400,"Doctor was not added")
-    }
-
-    const checkPassord = await foundUser.isPasswordCorrect(password)
-
-    if(!checkPassord) throw new ApiError(401,"invalid crednetials , password incorrect")
-
-    const {accessToken,refreshToken} = await generateAccessAndRefreshToken(foundUser._id,Doctor)
-
+const fetchAllVisit = asyncHandler(async(req,res) => {
+    const patientId = req.params.id;
+    const patient  = await Patient.findById(patientId)
+    .populate("steps")
+    // .select("-fullName -email -DOB -age -phoneNumber"); // according to need , will get these detials also
+    if(!patient) throw new ApiError(400,"failed to find patient")
     return res
     .status(200)
-    .cookie("accessToken",accessToken,options)
-    .cookie("refreshToken",refreshToken,options)
     .json(
         new ApiResponse(
             200,
-            {accessToken,refreshToken},
-            "Doctor Login Successful"
+            patient,
+            "fetched Patient Successfully"
         )
     )
 })
 
 
-const logOutDoctor = asyncHandler(async(req,res)=> {})
+// api endpoints for editing feilds
 
-
-const addVisit = asyncHandler(async (req,res) => {
-    const {purpose} = req.body;
-    const id = req.params.id;
-    const added = await Step.findOneAndUpdate({ patient: id },
+const firstStepEdit = asyncHandler(async(req,res) => {
+    const patientId = req.params.id;
+    await Step.findOneAndUpdate(
         {
-            $push:{
-                visits:{
-                    purpose: { value: purpose },
-                },
+            patient:patientId
+        },
+        {
+            $set:{
+              "visits.$[visit].stepFirst.$[step].isSubmitted":true,
             }
         },
         {
-            new:true
+          arrayFilters: [
+        { "visit.isCompleted": false },
+        { "step.isSubmitted": false }
+      ],
+          new:true
         }
     )
 
     return res
-    .status(200)
-    .json(
-        new ApiResponse(
-            200,
-            added,
-            "new visit added successfully"
-        )
+    .status(
+      200
+    ).json(
+      new ApiResponse(
+        200,
+        {},
+        "edited succesfully"
+      )
     )
 })
 
-export {loginDoctor,registerDoctor,logOutDoctor,addVisit}
+const secondStepEdit = asyncHandler(async(req,res) => {
+  const patientId = req.params.id;
+  const {distanceVision,nearVision} = req.body
+  console.log(distanceVision)
+  await Step.findOneAndUpdate(
+    {
+      patient:patientId
+    },
+    {
+      $set:{
+        "visits.$[visit].stepSecond.$[variable].distanceVision" : distanceVision, 
+        // ture or flase , should be taken from forntend
+        "visits.$[visit].stepSecond.$[variable].nearVision" : nearVision,
+        "visits.$[visit].stepSecond.$[variable].isSubmitted" : true,
+      }
+    },
+    {arrayFilters:[
+        { "visit.isCompleted": false },
+        // { "variable.isSubmitted": !distanceVision },
+        { "variable.isSubmitted": false }, 
+        // for now will just save one time then can update for toggle accoriding to frontend
+      ],
+      new:true
+  }
+  )
+
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(
+      200,
+      {},
+      "second field updated"
+    )
+  )
+})
+
+
+const stepThirdEdit = asyncHandler(async(req,res) => {
+  const patientId = req.params.id;
+  const {normality,isSubmitted} = req.body;
+  await Step.findOneAndUpdate(
+    {
+      patient:patientId
+    },
+    {
+      $set:{
+        "visits.$[visit].stepThird.$[step].normality":normality,
+        "visits.$[visit].stepThird.$[step].isSubmitted":isSubmitted
+      }
+    },
+    {
+      arrayFilters:[
+        {"visit.isCompleted":false},
+        {"step.isSubmitted": false}
+      ]
+    }
+  )
+
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(
+      200,
+      {},
+      "fileds updated successfully"
+    )
+  )
+})
+
+const stepFourthEdit = asyncHandler(async(req,res) => {
+  const patientId = req.params.id;
+  const {normality,isSubmitted} = req.body;
+  await Step.findOneAndUpdate(
+    {
+      patient:patientId
+    },
+    {
+      $set:{
+        "visits.$[visit].stepFourth.$[step].normality":normality,
+        "visits.$[visit].stepFourth.$[step].isSubmitted":true, 
+      }
+    },
+    {
+      arrayFilters:[
+        {"visit.isCompleted":false},
+        {"step.isSubmitted": false}
+      ],
+      new:true
+    }
+  )
+
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(
+      200,
+      {},
+      "updated step four successfully"
+    )
+  )
+})
+
+
+const stepFiveEdit = asyncHandler(async(req,res) => {
+  const patientId = req.params.id;
+  const {normality,isSubmitted} = req.body;
+  await Step.findOneAndUpdate(
+    {
+      patient:patientId,
+    },
+    {
+      $set:{
+        "visits.$[visit].stepFive.$[step].normality":normality,
+        "visits.$[visit].stepFive.$[step].isSubmitted":true, 
+      }
+    },
+    {
+      arrayFilters:[
+        {"visit.isCompleted":false},
+        {"step.isSubmitted": false}
+      ],
+      new:true
+    }
+  )
+
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(
+      200,
+      {},
+      "updated step Five successfully"
+    )
+  )
+})
+
+
+const finalSubmit = asyncHandler(async(req,res) => {
+  const patientId = req.params.id;
+  await Step.findOneAndUpdate(
+    {
+      patient:patientId
+    },
+    {
+      $set:{
+        isCompleted:true
+      }
+    }
+  )
+
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(
+      200,
+      {},
+      "final submission successful"
+    )
+  )
+})
+
+export { loginDoctor, registerDoctor, logOutDoctor, removeDoctor}
+
+
+export { addVisit ,fetchAllVisit , fetchAllPatient , firstStepEdit , secondStepEdit , stepThirdEdit , stepFourthEdit ,stepFiveEdit , finalSubmit};

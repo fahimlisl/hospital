@@ -32,7 +32,12 @@ const addPatient = asyncHandler(async(req,res) => {
             {
                 purpose:{
                     value:purpose
-                }
+                },
+                stepFirst:[
+                    {
+                        age:age
+                    }
+                ]
             }
         ]
     })

@@ -68,6 +68,32 @@ const loginAdmin = asyncHandler(async (req, res) => {
   )
 });
 
-export { adminRegister, loginAdmin };
+const logoutAdmin = asyncHandler(async(req,res) => {
+  const userId = req.user._id
+  await Admin.findByIdAndUpdate(userId,
+    {
+      $unset:{
+        refreshToken:""
+      }
+    },
+    {
+      new:true
+    }
+  );
+
+  return res
+  .status(200)
+  .clearCookie("refreshToken",options)
+  .clearCookie("accessToken",options)
+  .json(
+    new ApiResponse(
+      200,
+      {},
+      "Admin Logged OUt succesfully"
+    )
+  )
+})
+
+export { adminRegister, loginAdmin ,logoutAdmin};
 
 // max to max limit per day 2 to 3 eyetests
