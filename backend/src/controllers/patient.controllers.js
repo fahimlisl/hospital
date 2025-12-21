@@ -3,15 +3,26 @@ import {ApiError} from "../utils/ApiError.js"
 import { Patient } from "../models/patient.models.js";
 import {ApiResponse} from "../utils/ApiResponse.js"
 import { Step } from "../models/step.models.js";
+import { Prescription } from "../models/rXverification.models.js";
 
 
 const addPatient = asyncHandler(async(req,res) => {
-    const {fullName,phoneNumber,email,DOB,age,purpose} = req.body;
-    if(!fullName && !DOB && !age){
+    const {
+        fullName,
+        phoneNumber,
+        email,
+        DOB,
+        // age,
+        purpose,
+        gender
+    } = req.body;
+    if(!fullName && !DOB && !gender){
         throw new ApiError(400,"these fields must required")
     }
 
-    const check = await Patient.findOne({phoneNumber}) // will be using findOne as of now , gotta ask the authority wheather they wants to allow , mutiple user in same phoneNumber
+    const calculateAge = (new Date).getFullYear() - DOB;
+
+    const check = await Patient.findOne({phoneNumber}) // max to max 2-3 user allowed per day from same number
 
     if (check) {
         throw new ApiError(400,"Patient already exists")
@@ -20,8 +31,10 @@ const addPatient = asyncHandler(async(req,res) => {
         email : email || "",
         fullName,
         phoneNumber,
+        // DOB:new Date(DOB),
         DOB,
-        age
+        age:calculateAge,
+        gender
     })
     if(!createUser){
         throw new ApiError(401,"wasn't able to create Patitnet")
@@ -35,7 +48,7 @@ const addPatient = asyncHandler(async(req,res) => {
                 },
                 stepFirst:[
                     {
-                        age:age
+                        age:calculateAge
                     }
                 ]
             }
@@ -47,10 +60,21 @@ const addPatient = asyncHandler(async(req,res) => {
         throw new ApiError(400,"wasn't able to create Patient")
     }
 
+    const prescription = await Prescription.create({
+        patient:createUser._id,
+        step:setpP._id
+    })
+
+    if(!prescription){
+        await Step.findByIdAndDelete(setpP._id)
+        await Patient.findByIdAndDelete(createUser._id)
+        throw new ApiError(500,"wasn't able to create prescription document")
+    }
     const updatePatientDocument = await Patient.findByIdAndUpdate(createUser._id,
         {
             $set:{
-                steps:setpP._id
+                steps:setpP._id,
+                prescription:prescription._id,
             }
         }
     )
@@ -58,15 +82,32 @@ const addPatient = asyncHandler(async(req,res) => {
     if(!updatePatientDocument){
         await Patient.deleteOne({_id : createUser._id})
         await Step.deleteOne({_id : setpP._id})
+        await Prescription.findByIdAndDelete(prescription._id)
         throw new ApiError(400,"wasn't able to create Patient and document of patient and steps are deleted successfully")
     }
 
-    const finalUser = await Patient.findById(createUser._id).populate("steps")
+    const updateStepDocuemnt = await Step.findByIdAndUpdate(setpP._id,
+        {
+            $set:{
+                prescription:prescription._id,
+            }
+        }
+    )
+
+    if(!updateStepDocuemnt){
+        await Step.findByIdAndDelete(setpP._id)
+        await Patient.findByIdAndDelete(createUser._id)
+        await Prescription.findByIdAndDelete(prescription._id)
+        throw new ApiError(500,"successfuflyy deleted all the documents , cuz got field in contorller")
+    }
+
+    const finalUser = await Patient.findById(createUser._id).populate("steps").populate("prescription")
 
 
     if(!finalUser){
         await Patient.findByIdAndDelete(createUser._id)
         await Step.findOneAndDelete({patient:createUser._id})
+        await Prescription.findByIdAndDelete(prescription)
         throw new ApiError(500,"failed to create patient")
     }
 
@@ -83,4 +124,18 @@ const addPatient = asyncHandler(async(req,res) => {
 })
 
 
-export {addPatient}
+const countPatient = asyncHandler(async(req,res) => {
+    const noPatient = await Patient.countDocuments({})
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            noPatient,
+            "patient counted successfully"
+        )
+    )
+})
+
+export {addPatient , countPatient}

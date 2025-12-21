@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { Admin } from "../models/admin.models.js";
 import { options } from "../utils/options.js";
 import generateAccessAndRefreshToken from "../utils/generateA&RT.js";
+import { Doctor } from "../models/doctor.models.js";
 
 
 const adminRegister = asyncHandler(async (req, res) => {
@@ -94,6 +95,73 @@ const logoutAdmin = asyncHandler(async(req,res) => {
   )
 })
 
+const fetchAllDoctors = asyncHandler(async(req,res) =>{
+  const doctors = await Doctor.find({})
+
+
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(
+      200,
+      doctors,
+      "all doctors have been fetched successfully"
+    )
+  )
+})
+
+const noOfDoctors = asyncHandler(async(req,res) => {
+  const count = await Doctor.countDocuments({})
+
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(
+      200,
+      count,
+      "no of counts are fetched succesfully"
+    )
+  )
+})
+
+const updateDoctor = asyncHandler(async(req,res) => {
+  const doctorId = req.params.id;
+  const {fullName,email,phoneNumber,qualification,department} = req.body;
+
+  if(!(email || fullName || phoneNumber || qualification || department)) throw new ApiError(401,"at least one field is requried")
+
+  const doctor = await Doctor.findByIdAndUpdate(
+    doctorId,
+    {
+      $set:{
+        fullName,
+        email,
+        phoneNumber,
+        qualification,
+        department
+      }
+    },
+    {
+      new:true
+    }
+  ).select("-password -refreshToken")
+  if(!doctor) throw new ApiError(500,"fialed to updated doctor")
+
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(
+      200,
+      doctor,
+      "doctor updated Succesfully"
+    )
+  )
+})
+
+
+
 export { adminRegister, loginAdmin ,logoutAdmin};
+
+export {noOfDoctors,fetchAllDoctors,updateDoctor}
 
 // max to max limit per day 2 to 3 eyetests

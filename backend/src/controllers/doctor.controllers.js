@@ -6,6 +6,7 @@ import { options } from "../utils/options.js";
 import generateAccessAndRefreshToken from "../utils/generateA&RT.js";
 import { Step } from "../models/step.models.js";
 import { Patient } from "../models/patient.models.js";
+import { Prescription } from "../models/rXverification.models.js";
 
 const registerDoctor = asyncHandler(async (req, res) => {
   const { phoneNumber, email, fullName, department, qualification, password } =
@@ -291,6 +292,76 @@ const stepFiveEdit = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "updated step Five successfully"));
 });
 
+const stepSixEdit = asyncHandler(async(req,res) => {
+  const patientId = req.params.id;
+  const {fog,jcc,duochrome} = req.body;
+  await Step.findOneAndUpdate(
+    {
+      patient:patientId
+    },
+    {
+      $set:{
+        "visits.$[visit].stepSix.$[step].fogging":fog, // true -> required , false -> not required
+        "visits.$[visit].stepSix.$[step].jcc":jcc,  // true -> required , false -> not required
+        "visits.$[visit].stepSix.$[step].duochrome":duochrome, // there's enum of enum:["red","brown","grey"], there should be dropdown boxes for selection in forntend for only these three
+        "visits.$[visit].stepSix.$[step].isSubmitted":true
+      }
+    },
+    {
+      arrayFilters:[
+       { "visit.isCompleted":false},
+        {"step.isSubmitted":false}
+      ],
+      new:true
+    }
+  )
+
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(
+      200,
+      {},
+      "step six submitted and edited succesfully"
+    )
+  )
+})
+
+const stepSevenEdit = asyncHandler(async(req,res) => {
+  const patientId = req.params.id;
+  const {ans} = req.body;
+  await Step.findOneAndUpdate(
+    {
+      patient:patientId
+    },
+    {
+      $set:{
+        "visits.$[visit].stepSeven.$[step].ans":ans,
+        "visits.$[visit].stepSeven.$[step].isSubmitted":true,
+
+      }
+    },
+    {
+      arrayFilters:[
+        {"visit.isCompleted":false},
+        {"step.isSubmitted":false}
+      ],
+      new:true
+    }
+  )
+
+  return res
+  .status(200)
+  .json(
+     new ApiResponse(
+      200,
+      {},
+      "step seven updated and edited successfully"
+     )
+  )
+})
+
+
 const finalSubmit = asyncHandler(async (req, res) => {
   const patientId = req.params.id;
   await Step.findOneAndUpdate(
@@ -298,9 +369,15 @@ const finalSubmit = asyncHandler(async (req, res) => {
       patient: patientId,
     },
     {
-      $set: {
-        isCompleted: true,
-      },
+      $set:{
+        "visits.$[visit].isCompleted":true
+      }
+    },
+    {
+      arrayFilters:[
+        {"visit.isCompleted":false}
+      ],
+      new:true
     }
   );
 
@@ -308,6 +385,66 @@ const finalSubmit = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, {}, "final submission successful"));
 });
+
+
+const removePatient = asyncHandler(async(req,res) => {
+  const patientId = req.params.id;
+  const pat = await Patient.findByIdAndDelete(patientId)
+  if(!pat) throw new ApiError(500 , "wasn't able to delete the patient")
+  const s = await Step.findOneAndDelete({patient:patientId})
+  if(!s) throw new ApiError(500,"wasn't able to delete the step document")
+  const p = await Prescription.findOneAndDelete({patient:patientId})
+  if(!p) throw new ApiError(500,"wasn't able to delete the prescription document")
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(
+      200,
+      {},
+      "successfully deleted the patient and patient step docuemtn along"
+    )
+  )
+})
+
+const fetchAllVisitOfParticular = asyncHandler(async(req,res) => {
+  const patientId = req.params.id;
+  const step = await Step.findOne({patient:patientId})
+  if(!step) throw new ApiError(400,"wasn't able to find any step")
+  const all = step.visits
+
+
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(
+      200,
+      all,
+      "all visits are fetched succesfully"
+    )
+  )
+})
+
+const fetchParticularVisit = asyncHandler(async(req,res) => {
+  const visitId = req.params.id
+  const visit = await Step.findOne({
+    visits:{
+      $elemMatch:{_id:visitId}
+    }
+  })
+  const response = visit.visits.find((t) => t._id == visitId)
+  console.log(response)
+
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(
+      200,
+      response,
+      "fetched specifiec visit successfully"
+    )
+  )
+
+})
 
 export { loginDoctor, registerDoctor, logOutDoctor, removeDoctor };
 
@@ -320,5 +457,10 @@ export {
   stepThirdEdit,
   stepFourthEdit,
   stepFiveEdit,
+  stepSixEdit,
+  stepSevenEdit,
   finalSubmit,
+  removePatient,
+  fetchAllVisitOfParticular,
+  fetchParticularVisit
 };

@@ -78,6 +78,38 @@ const purposeSchema = new mongoose.Schema({
     },
 },{timestamps:true})
 
+const subjective = new mongoose.Schema({
+  fogging:{
+    type:Boolean,
+    default:false // false -> not required , true -> required
+  },
+  jcc:{
+    type:Boolean,
+    default:false // false -> not required , true -> required
+  },
+  duochrome:{
+    type:String,
+    enum:["red","brown","grey"],
+    default:"grey"
+  },
+  isSubmitted: {
+      type: Boolean,
+      default: false,
+    },
+},{timestamps:true})
+
+const nearVision = new mongoose.Schema({
+  ans:{
+    type:Boolean,
+    default:false // flase -> No , true -> Yes
+  },
+  isSubmitted:{
+    type:Boolean,
+    default:false
+  }
+},{timestamps:true})
+
+
 const repeateSchema = new mongoose.Schema({
   purpose:{
     type:purposeSchema,
@@ -129,11 +161,31 @@ const repeateSchema = new mongoose.Schema({
       },
     ],
   },
+  stepSix:{
+    type:[subjective],
+    default: () => [
+      {
+        fogging:false,
+        jcc:false,
+        duochrome:"grey",
+        isSubmitted:false
+      }
+    ]
+  },
+  stepSeven: {
+    type:[nearVision],
+    default: () => [
+      {
+        ans:false, // true -> Yes , flase -> No , in frontend
+        isSubmitted:false
+      }
+    ]
+  },
   patient: {
     type: Schema.Types.ObjectId,
     ref: "Patient",
   },
-  isCompleted: { // have to remove this , cuz this has no fucntion till now
+  isCompleted: { // need this for setting arrayFilter
     type: Boolean,
     default: false,
   },
@@ -145,17 +197,19 @@ const stepSchema = new mongoose.Schema({
     type: Schema.Types.ObjectId,
     ref: "Patient",
   },
-  isCompleted: {
+  isCompleted: { // don't need this ig as per requirements
     type: Boolean,
     default: false,
   },
   visits:{
     type:[repeateSchema],
     default:() => [{}],
+  },
+  // this will be wroking as step eight (8)
+  prescription:{ // maybe will change the annotaion of it to rxverification later , for now lets keep it as it is
+    type: Schema.Types.ObjectId,
+    ref:"prescription"
   }
 });
 
 export const Step = mongoose.model("Step", stepSchema);
-
-
-// for now experimental purpose , keeping the purpose same and fixed , will add conclusion of treatment at the end , 

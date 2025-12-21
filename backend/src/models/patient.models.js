@@ -7,14 +7,18 @@ const patientSchema = new mongoose.Schema({
     },
     phoneNumber:{
         type:Number,
-        required:true // maybe have to change to flase , 
+        required:true 
     },
     email:{
         type:String,
     },
-    DOB:{
-        // type:Date
-        type:String
+    DOB:{ // gotta put restrictions there , to avoid mis conufcions in year detials
+        type:Number
+    },
+    gender:{
+        type:String,
+        enum:["Male","Female","Prefer Not To Say"],
+        required:true
     },
     steps:{
         type: Schema.Types.ObjectId,
@@ -22,7 +26,11 @@ const patientSchema = new mongoose.Schema({
     },
     age:{
         type:Number,
-        required:true
+        // required:true
+    },
+    prescription:{
+        type:Schema.Types.ObjectId,
+        ref:"Prescription"
     }
 },{timestamps:true})
 
