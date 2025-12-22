@@ -47,16 +47,12 @@ const eyeSchema = new mongoose.Schema({
     }
 },{timestamps:true})
 
-const prescriptionSchema = new mongoose.Schema({
-    patient:{
-        type:Schema.Types.ObjectId,
-        ref:"Patient"
-    },
-    step:{
-        type:Schema.Types.ObjectId,
-        ref:"Step"
-    },
-    bifocal: {
+const repeatPrescription = new mongoose.Schema({
+        subStep:{
+            type:Schema.Types.ObjectId,
+            ref:"Step"
+        },
+        bifocal: {
         type:[eyeSchema],
         default:() => [
             {
@@ -119,6 +115,21 @@ const prescriptionSchema = new mongoose.Schema({
             }
         ]
     } // frontend -> Far Vision Power
+},{timestamps:true})
+
+const prescriptionSchema = new mongoose.Schema({
+    patient:{
+        type:Schema.Types.ObjectId,
+        ref:"Patient"
+    },
+    step:{
+        type:Schema.Types.ObjectId,
+        ref:"Step"
+    },
+    prescription:{
+        type:[repeatPrescription],
+        default: () => [{}],
+    }
 },{timestamps:true})
 
 // later may have to add next date for visit !!

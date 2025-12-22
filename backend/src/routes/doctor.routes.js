@@ -3,7 +3,7 @@ import { addVisit, fetchAllPatient, fetchAllVisit, fetchParticularVisit, finalSu
 import { verifyJWT } from "../middlewares/auth.middlewares.js"
 import { addPatient, countPatient } from "../controllers/patient.controllers.js"
 import { noOfCompletedCheckuP } from "../controllers/step.controllers.js"
-import { prescriptionP } from "../controllers/prescription.controllers.js"
+import { fetchParticularPrecriptionPerStep, prescriptionP } from "../controllers/prescription.controllers.js"
 
 
 const router = Router()
@@ -39,7 +39,7 @@ router.route("/countSuccess").get(verifyJWT,noOfCompletedCheckuP)
 
 // precreiption routes
 router.route("/updatePrescription/:id").patch(verifyJWT,prescriptionP)
-
+router.route("/fethParticularPrecription/:id").get(verifyJWT,fetchParticularPrecriptionPerStep)
 
 
 // 

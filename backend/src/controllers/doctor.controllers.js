@@ -109,32 +109,70 @@ const removeDoctor = asyncHandler(async (req, res) => {
 
 const addVisit = asyncHandler(async (req, res) => {
   const { purpose } = req.body;
-  const id = req.params.id;
-  const pp = await Step.findOne({ patient: id });
-  const prevAge = pp.visits[0].stepFirst[0].age;
-  const added = await Step.findOneAndUpdate(
-    { patient: id },
+  const patientId = req.params.id;
+  const stepDoc = await Step.findOne({ patient: patientId });
+  if (!stepDoc) throw new ApiError(404, "Step not found");
+
+  const prevAge = stepDoc.visits[0].stepFirst[0].age;
+
+  const updatedStep = await Step.findOneAndUpdate(
+    { patient: patientId },
     {
       $push: {
         visits: {
           purpose: { value: purpose },
-          stepFirst: [
-            {
-              age: prevAge,
-            },
-          ],
+          stepFirst: [{ age: prevAge }],
         },
       },
     },
+    { new: true }
+  );
+
+  const newVisit =
+    updatedStep.visits[updatedStep.visits.length - 1];
+
+  const updatedPrescription =
+    await Prescription.findOneAndUpdate(
+      { patient: patientId },
+      {
+        $push: {
+          prescription: {
+            subStep: newVisit._id,
+          },
+        },
+      },
+      { new: true }
+    );
+
+  const newSubPrescription =
+    updatedPrescription.prescription[
+      updatedPrescription.prescription.length - 1
+    ];
+
+  await Step.findOneAndUpdate(
     {
-      new: true,
+      patient: patientId,
+      "visits._id": newVisit._id,
+    },
+    {
+      $set: {
+        "visits.$.subPrescription": newSubPrescription._id,
+      },
     }
   );
 
-  return res
-    .status(200)
-    .json(new ApiResponse(200, added, "new visit added successfully"));
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        visitId: newVisit._id,
+        subPrescriptionId: newSubPrescription._id,
+      },
+      "New visit & prescription linked successfully"
+    )
+  );
 });
+
 
 // will filter patients by name or phonenumber via frontend
 const fetchAllPatient = asyncHandler(async (req, res) => {

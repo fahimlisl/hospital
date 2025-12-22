@@ -111,6 +111,10 @@ const nearVision = new mongoose.Schema({
 
 
 const repeateSchema = new mongoose.Schema({
+  subPrescription:{
+    type:Schema.Types.ObjectId,
+    ref:"Prescription"
+  },
   purpose:{
     type:purposeSchema,
     required:true

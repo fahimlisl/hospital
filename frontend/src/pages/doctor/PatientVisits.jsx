@@ -55,7 +55,6 @@ const PatientVisits = () => {
 
   return (
     <div className="max-w-5xl mx-auto px-4">
-      {/* Header */}
       <div className="mb-10">
         <h1 className="text-3xl font-semibold tracking-tight">
           Patient Visits
@@ -120,6 +119,18 @@ const PatientVisits = () => {
                       <Eye size={14} />
                       View
                     </button>
+                      <button
+  onClick={() =>
+    navigate(`/doctor/prescription/${id}/${v._id}`)
+  }
+  className="flex items-center gap-1.5 px-4 py-1.5 rounded-full
+  bg-purple-600/20 text-purple-400 hover:bg-purple-600/30 transition text-sm"
+>
+  Prescription
+</button>
+
+
+
 
 
                     {!completed && (
@@ -132,6 +143,7 @@ const PatientVisits = () => {
                         <Play size={14} />
                         Resume
                       </button>
+                      
                     )}
                   </div>
                 </div>

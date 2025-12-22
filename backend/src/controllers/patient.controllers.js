@@ -31,7 +31,6 @@ const addPatient = asyncHandler(async(req,res) => {
         email : email || "",
         fullName,
         phoneNumber,
-        // DOB:new Date(DOB),
         DOB,
         age:calculateAge,
         gender
@@ -54,6 +53,8 @@ const addPatient = asyncHandler(async(req,res) => {
             }
         ]
     })
+    // test purpose
+    console.log(`getting the value of setpP.visits[0]._id ${setpP.visits[0]._id}`)
 
     if(!setpP){
         await Patient.deleteOne({_id : createUser._id})
@@ -62,7 +63,12 @@ const addPatient = asyncHandler(async(req,res) => {
 
     const prescription = await Prescription.create({
         patient:createUser._id,
-        step:setpP._id
+        step:setpP._id,
+        prescription:[ // lets see wheather we need $set field or directly app
+            {
+                subStep:setpP.visits[0]._id
+            }
+        ]
     })
 
     if(!prescription){
@@ -86,13 +92,19 @@ const addPatient = asyncHandler(async(req,res) => {
         throw new ApiError(400,"wasn't able to create Patient and document of patient and steps are deleted successfully")
     }
 
-    const updateStepDocuemnt = await Step.findByIdAndUpdate(setpP._id,
-        {
-            $set:{
-                prescription:prescription._id,
-            }
-        }
-    )
+    const updateStepDocuemnt = await Step.findOneAndUpdate(
+  {
+    _id: setpP._id,
+    "visits._id": setpP.visits[0]._id
+  },
+  {
+    $set:{
+      "visits.$.subPrescription": prescription.prescription[0]._id,
+      prescription: prescription._id
+    }
+  },
+  { new:true }
+);
 
     if(!updateStepDocuemnt){
         await Step.findByIdAndDelete(setpP._id)
