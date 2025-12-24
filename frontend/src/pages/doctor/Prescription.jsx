@@ -7,10 +7,11 @@ import { ArrowRight, FileText } from "lucide-react";
 const Prescription = () => {
   const { patientId, visitId } = useParams();
   const navigate = useNavigate();
+
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
 
-  const [form, setForm] = useState({
+  const emptyForm = {
     sphericalLB: 0, cylindricalLB: 0, axisLB: 0, pupilDistanceLB: 0, addPowerLB: 0,
     sphericalRB: 0, cylindricalRB: 0, axisRB: 0, pupilDistanceRB: 0, addPowerRB: 0,
 
@@ -19,7 +20,10 @@ const Prescription = () => {
 
     sphericalLF: 0, cylindricalLF: 0, axisLF: 0, pupilDistanceLF: 0, addPowerLF: 0,
     sphericalRF: 0, cylindricalRF: 0, axisRF: 0, pupilDistanceRF: 0, addPowerRF: 0,
-  });
+  };
+
+  const [form, setForm] = useState(emptyForm);
+
 
   useEffect(() => {
     const fetchPrescription = async () => {
@@ -28,54 +32,56 @@ const Prescription = () => {
           `/doctor/fethParticularPrecription/${patientId}`
         );
 
-        const all = res.data.data?.prescription || [];
-        const current = all.find((p) => p.subStep === visitId);
+        const list = res.data?.data?.prescription || [];
+        const current = list.find(
+          (p) => String(p.subStep) === String(visitId)
+        );
 
         if (!current) return;
 
-        const bifocal = current.bifocal?.[0];
-        const near = current.nearVisionPower?.[0];
-        const far = current.farVisionPower?.[0];
+        const bifocal = current.bifocal?.[0] || {};
+        const near = current.nearVisionPower?.[0] || {};
+        const far = current.farVisionPower?.[0] || {};
 
         setForm({
           // BIFOCAL
-          sphericalLB: bifocal.leftEye.spherical,
-          cylindricalLB: bifocal.leftEye.cylindrical,
-          axisLB: bifocal.leftEye.axis,
-          pupilDistanceLB: bifocal.leftEye.pupilDistance,
-          addPowerLB: bifocal.leftEye.addPower,
+          sphericalLB: bifocal?.leftEye?.spherical ?? 0,
+          cylindricalLB: bifocal?.leftEye?.cylindrical ?? 0,
+          axisLB: bifocal?.leftEye?.axis ?? 0,
+          pupilDistanceLB: bifocal?.leftEye?.pupilDistance ?? 0,
+          addPowerLB: bifocal?.leftEye?.addPower ?? 0,
 
-          sphericalRB: bifocal.rightEye.spherical,
-          cylindricalRB: bifocal.rightEye.cylindrical,
-          axisRB: bifocal.rightEye.axis,
-          pupilDistanceRB: bifocal.rightEye.pupilDistance,
-          addPowerRB: bifocal.rightEye.addPower,
+          sphericalRB: bifocal?.rightEye?.spherical ?? 0,
+          cylindricalRB: bifocal?.rightEye?.cylindrical ?? 0,
+          axisRB: bifocal?.rightEye?.axis ?? 0,
+          pupilDistanceRB: bifocal?.rightEye?.pupilDistance ?? 0,
+          addPowerRB: bifocal?.rightEye?.addPower ?? 0,
 
           // NEAR
-          sphericalLN: near.leftEye.spherical,
-          cylindricalLN: near.leftEye.cylindrical,
-          axisLN: near.leftEye.axis,
-          pupilDistanceLN: near.leftEye.pupilDistance,
-          addPowerLN: near.leftEye.addPower,
+          sphericalLN: near?.leftEye?.spherical ?? 0,
+          cylindricalLN: near?.leftEye?.cylindrical ?? 0,
+          axisLN: near?.leftEye?.axis ?? 0,
+          pupilDistanceLN: near?.leftEye?.pupilDistance ?? 0,
+          addPowerLN: near?.leftEye?.addPower ?? 0,
 
-          sphericalRN: near.rightEye.spherical,
-          cylindricalRN: near.rightEye.cylindrical,
-          axisRN: near.rightEye.axis,
-          pupilDistanceRN: near.rightEye.pupilDistance,
-          addPowerRN: near.rightEye.addPower,
+          sphericalRN: near?.rightEye?.spherical ?? 0,
+          cylindricalRN: near?.rightEye?.cylindrical ?? 0,
+          axisRN: near?.rightEye?.axis ?? 0,
+          pupilDistanceRN: near?.rightEye?.pupilDistance ?? 0,
+          addPowerRN: near?.rightEye?.addPower ?? 0,
 
           // FAR
-          sphericalLF: far.leftEye.spherical,
-          cylindricalLF: far.leftEye.cylindrical,
-          axisLF: far.leftEye.axis,
-          pupilDistanceLF: far.leftEye.pupilDistance,
-          addPowerLF: far.leftEye.addPower,
+          sphericalLF: far?.leftEye?.spherical ?? 0,
+          cylindricalLF: far?.leftEye?.cylindrical ?? 0,
+          axisLF: far?.leftEye?.axis ?? 0,
+          pupilDistanceLF: far?.leftEye?.pupilDistance ?? 0,
+          addPowerLF: far?.leftEye?.addPower ?? 0,
 
-          sphericalRF: far.rightEye.spherical,
-          cylindricalRF: far.rightEye.cylindrical,
-          axisRF: far.rightEye.axis,
-          pupilDistanceRF: far.rightEye.pupilDistance,
-          addPowerRF: far.rightEye.addPower,
+          sphericalRF: far?.rightEye?.spherical ?? 0,
+          cylindricalRF: far?.rightEye?.cylindrical ?? 0,
+          axisRF: far?.rightEye?.axis ?? 0,
+          pupilDistanceRF: far?.rightEye?.pupilDistance ?? 0,
+          addPowerRF: far?.rightEye?.addPower ?? 0,
         });
       } catch {
         toast.error("Failed to load prescription");
@@ -87,8 +93,10 @@ const Prescription = () => {
     fetchPrescription();
   }, [patientId, visitId]);
 
+
   const handleChange = (e) => {
     const value = e.target.value;
+
     if (value === "") {
       setForm({ ...form, [e.target.name]: "" });
       return;
@@ -126,7 +134,7 @@ const Prescription = () => {
   }
 
   return (
-    <div className="space-y-14">
+    <div className="max-w-6xl mx-auto px-4 space-y-14">
       <Header />
 
       <RxTable title="Bifocal / Progressive Power" prefix="B" form={form} onChange={handleChange} />
@@ -136,8 +144,10 @@ const Prescription = () => {
       <button
         onClick={submitPrescription}
         disabled={loading}
-        className="w-full flex items-center justify-center gap-3 px-8 py-4 rounded-2xl
-        bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition"
+        className="w-full sm:w-auto sm:px-16 px-8 py-4 rounded-2xl
+        bg-emerald-600 text-white font-semibold
+        flex items-center justify-center gap-3
+        hover:bg-emerald-700 transition disabled:opacity-60"
       >
         {loading ? "Saving..." : "Save Prescription"}
         <ArrowRight size={18} />
@@ -159,21 +169,24 @@ const Header = () => (
       </span>
     </div>
 
-    <h1 className="text-3xl font-semibold">Clinical Prescription</h1>
+    <h1 className="text-3xl font-semibold tracking-tight">
+      Clinical Prescription
+    </h1>
     <p className="text-gray-400 mt-2">
       Allowed range: <b>-10 to +10</b> (fractions supported)
     </p>
   </div>
 );
 
+
 const RxTable = ({ title, prefix, form, onChange }) => (
-  <div className="rounded-[28px] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-6 overflow-x-auto">
+  <div className="rounded-[28px] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-5 sm:p-6 overflow-x-auto">
     <h2 className="text-xl font-semibold mb-6">{title}</h2>
 
     <table className="min-w-[720px] w-full text-sm">
       <thead className="text-gray-400">
         <tr>
-          <th>Eye</th>
+          <th className="text-left">Eye</th>
           <th>Spherical</th>
           <th>Cylindrical</th>
           <th>Axis</th>
@@ -191,7 +204,7 @@ const RxTable = ({ title, prefix, form, onChange }) => (
 
             {["spherical", "cylindrical", "axis", "pupilDistance", "addPower"].map(
               (field) => (
-                <td key={field}>
+                <td key={field} className="px-1">
                   <input
                     type="number"
                     step="0.25"
@@ -200,7 +213,9 @@ const RxTable = ({ title, prefix, form, onChange }) => (
                     name={`${field}${eye}${prefix}`}
                     value={form[`${field}${eye}${prefix}`]}
                     onChange={onChange}
-                    className="w-full px-3 py-2 rounded-lg bg-black/40 border border-white/10"
+                    className="w-full px-3 py-2 rounded-lg
+                    bg-black/40 border border-white/10
+                    focus:outline-none focus:ring-2 focus:ring-emerald-600/40"
                   />
                 </td>
               )
