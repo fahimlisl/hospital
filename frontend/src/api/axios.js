@@ -19,7 +19,9 @@ const api = axios.create({
 
 
 api.interceptors.request.use(
+  
   (config) => {
+    console.log("🔥 AXIOS INSTANCE WITH INTERCEPTOR LOADED");
     const token = localStorage.getItem("accessToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;

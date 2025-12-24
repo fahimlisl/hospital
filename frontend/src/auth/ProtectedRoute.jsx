@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import api from "../api/axios";
+import api from "../api/axios.js"
 
 const ProtectedRoute = ({ children, role }) => {
   const location = useLocation();
