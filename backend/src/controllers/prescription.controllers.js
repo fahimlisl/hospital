@@ -94,7 +94,7 @@ const fetchParticularPrecriptionPerStep = asyncHandler(async(req,res) =>{
         {
             patient:patientId
         }
-    ).select("-_id -step -patient -createdAt -updatedAt -__v")
+    ).select("-step -patient -createdAt -updatedAt -__v")
 
     return res
     .status(200)

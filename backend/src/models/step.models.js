@@ -89,7 +89,7 @@ const subjective = new mongoose.Schema({
   },
   duochrome:{
     type:String,
-    enum:["red","brown","grey"],
+    enum:["red","green","balanced"],
     default:"grey"
   },
   isSubmitted: {
@@ -171,7 +171,7 @@ const repeateSchema = new mongoose.Schema({
       {
         fogging:false,
         jcc:false,
-        duochrome:"grey",
+        duochrome:"balanced",
         isSubmitted:false
       }
     ]

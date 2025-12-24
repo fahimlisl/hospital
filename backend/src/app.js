@@ -2,12 +2,15 @@ import express from "express"
 import cookieParser from "cookie-parser"
 import cors from "cors"
 import morgan from "morgan"
+import dotenv from "dotenv"
 
+dotenv.config({
+    path:"./.env"
+})
 const app = express()
 
 app.use(cors({
-    // origin:process.env.CORS_ORIGIN,
-    origin:"http://localhost:5173",
+    origin:process.env.CORS_ORIGIN,
     credentials:true
 }))
 
@@ -22,8 +25,11 @@ app.use(express.static("public"))
 import adminRotuer from "./routes/admin.routes.js"
 import patientRouter from "./routes/patient.routes.js"
 import doctorRotuer from "./routes/doctor.routes.js"
+import prescriptionRouter from "./routes/prescriptionPDF.routes.js"
+
 app.use("/api/v1/admin",adminRotuer)
 app.use("/api/v1/patient",patientRouter)
 app.use("/api/v1/doctor",doctorRotuer)
+app.use("/api/v1/prescriptions",prescriptionRouter)
 
 export {app}

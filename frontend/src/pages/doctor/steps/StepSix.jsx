@@ -1,36 +1,37 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import api from "../../../api/axios";
 import toast from "react-hot-toast";
-import { Option } from "../../../components/StepUI";
+import { Option, StatusButtons } from "../../../components/StepUI";
 
-const StepSix = ({ patientId, visit, onDone }) => {
-  const step = visit.stepSix?.[0];
+const StepSix = ({ patientId, visit }) => {
+  const step = visit?.stepSix?.[0];
 
-  const [fogging, setFogging] = useState(step?.fogging ?? false);
-  const [jcc, setJcc] = useState(step?.jcc ?? false);
-  const [duochrome, setDuochrome] = useState(step?.duochrome ?? "grey");
+  const [fogging, setFogging] = useState(false);
+  const [jcc, setJcc] = useState(false);
+  const [duochrome, setDuochrome] = useState("balanced");
+
   const [loading, setLoading] = useState(false);
 
-  if (step?.isSubmitted) {
-    return (
-      <div className="bg-white/5 p-6 rounded-2xl border border-white/10 text-gray-400">
-        Step 6 completed
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (!step) return;
 
-  const submit = async () => {
+    setFogging(step.fogging ?? false);
+    setJcc(step.jcc ?? false);
+    setDuochrome(step.duochrome || "balanced");
+  }, [step]);
+
+  const handleSubmit = async () => {
     setLoading(true);
     try {
       await api.patch(`/doctor/sixthStep/${patientId}`, {
         fog: fogging,
-        jcc,
+        jcc: jcc,
         duochrome,
       });
+
       toast.success("Step 6 saved");
-      onDone();
     } catch {
-      toast.error("Failed to submit step");
+      toast.error("Failed to save step 6");
     } finally {
       setLoading(false);
     }
@@ -39,36 +40,78 @@ const StepSix = ({ patientId, visit, onDone }) => {
   return (
     <div className="bg-white/10 p-6 rounded-2xl border border-white/10">
       <h2 className="font-semibold text-lg mb-6">
-        Step 6: Subjective Refraction
+        Step 6 · Subjective Assessment
       </h2>
 
-      <div className="flex gap-4 mb-4">
-        <Option label="Fogging" active={fogging} onClick={() => setFogging(!fogging)} />
-        <Option label="JCC" active={jcc} onClick={() => setJcc(!jcc)} />
+      <div className="mb-6">
+        <p className="text-sm text-gray-400 mb-2">
+          Fogging
+        </p>
+
+        <div className="flex gap-4">
+          <Option
+            label="Refined"
+            active={fogging === true}
+            onClick={() => setFogging(true)}
+          />
+          <Option
+            label="Not Refined"
+            danger
+            active={fogging === false}
+            onClick={() => setFogging(false)}
+          />
+        </div>
       </div>
 
       <div className="mb-6">
-        <label className="text-sm text-gray-400 mb-2 block">
+        <p className="text-sm text-gray-400 mb-2">
+          JCC
+        </p>
+
+        <div className="flex gap-4">
+          <Option
+            label="Refined"
+            active={jcc === true}
+            onClick={() => setJcc(true)}
+          />
+          <Option
+            label="Not Refined"
+            danger
+            active={jcc === false}
+            onClick={() => setJcc(false)}
+          />
+        </div>
+      </div>
+
+      <div className="mb-8">
+        <p className="text-sm text-gray-400 mb-2">
           Duochrome
-        </label>
+        </p>
+
         <select
           value={duochrome}
           onChange={(e) => setDuochrome(e.target.value)}
-          className="w-full px-4 py-2 rounded-xl bg-black/40 border border-white/10"
+          className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10
+          focus:outline-none focus:ring-2 focus:ring-emerald-600/40"
         >
           <option value="red">Red</option>
-          <option value="brown">Brown</option>
-          <option value="grey">Grey</option>
+          <option value="green">Green</option>
+          <option value="balanced">Balanced</option>
         </select>
       </div>
 
-      <button
-        onClick={submit}
-        disabled={loading}
-        className="px-6 py-2 rounded-xl bg-emerald-600 text-white"
-      >
-        {loading ? "Saving..." : "Save Step"}
-      </button>
+      <div className="flex justify-end">
+        <button
+          onClick={handleSubmit}
+          disabled={loading}
+          className="bg-emerald-600 px-6 py-2 rounded-xl text-white
+          hover:bg-emerald-700 transition disabled:opacity-50"
+        >
+          {loading ? "Saving..." : "Save Step 6"}
+        </button>
+      </div>
+
+      {step?.isSubmitted && <StatusButtons />}
     </div>
   );
 };
