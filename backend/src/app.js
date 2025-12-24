@@ -32,4 +32,13 @@ app.use("/api/v1/patient",patientRouter)
 app.use("/api/v1/doctor",doctorRotuer)
 app.use("/api/v1/prescriptions",prescriptionRouter)
 
+
+app.get("/health", (req, res) => {
+  res.status(200).json({ 
+    status: "OK", 
+    message: "Server is running",
+    timestamp: new Date().toISOString()
+  });
+});
+
 export {app}
