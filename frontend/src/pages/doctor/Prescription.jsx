@@ -134,24 +134,27 @@ const Prescription = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 space-y-14">
+    <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 space-y-8 sm:space-y-12 lg:space-y-14">
       <Header />
 
       <RxTable title="Bifocal / Progressive Power" prefix="B" form={form} onChange={handleChange} />
       <RxTable title="Near Vision Power" prefix="N" form={form} onChange={handleChange} />
       <RxTable title="Far Vision Power" prefix="F" form={form} onChange={handleChange} />
 
-      <button
-        onClick={submitPrescription}
-        disabled={loading}
-        className="w-full sm:w-auto sm:px-16 px-8 py-4 rounded-2xl
-        bg-emerald-600 text-white font-semibold
-        flex items-center justify-center gap-3
-        hover:bg-emerald-700 transition disabled:opacity-60"
-      >
-        {loading ? "Saving..." : "Save Prescription"}
-        <ArrowRight size={18} />
-      </button>
+      <div className="sticky bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black to-transparent pt-6 pb-4 -mx-3 px-3 sm:mx-0 sm:px-0 sm:static sm:bg-none sm:pt-0">
+        <button
+          onClick={submitPrescription}
+          disabled={loading}
+          className="w-full sm:w-auto sm:px-12 lg:px-16 px-6 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl
+          bg-emerald-600 text-white font-semibold text-sm sm:text-base
+          flex items-center justify-center gap-2 sm:gap-3
+          hover:bg-emerald-700 active:scale-95 transition disabled:opacity-60 disabled:active:scale-100
+          shadow-lg shadow-emerald-600/20"
+        >
+          {loading ? "Saving..." : "Save Prescription"}
+          <ArrowRight size={18} className="flex-shrink-0" />
+        </button>
+      </div>
     </div>
   );
 };
@@ -160,69 +163,108 @@ export default Prescription;
 
 const Header = () => (
   <div>
-    <div className="flex items-center gap-4 mb-4">
-      <div className="w-12 h-12 rounded-2xl bg-emerald-600/20 flex items-center justify-center ring-1 ring-emerald-500/30">
-        <FileText className="text-emerald-400" />
+    <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-emerald-600/20 flex items-center justify-center ring-1 ring-emerald-500/30">
+        <FileText className="text-emerald-400 w-5 h-5 sm:w-6 sm:h-6" />
       </div>
-      <span className="text-xs tracking-[0.3em] uppercase text-emerald-400">
+      <span className="text-[10px] sm:text-xs tracking-[0.2em] sm:tracking-[0.3em] uppercase text-emerald-400">
         Prescription
       </span>
     </div>
 
-    <h1 className="text-3xl font-semibold tracking-tight">
+    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight">
       Clinical Prescription
     </h1>
-    <p className="text-gray-400 mt-2">
+    <p className="text-gray-400 mt-2 text-sm sm:text-base">
       Allowed range: <b>-10 to +10</b> (fractions supported)
     </p>
   </div>
 );
 
 
-const RxTable = ({ title, prefix, form, onChange }) => (
-  <div className="rounded-[28px] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-5 sm:p-6 overflow-x-auto">
-    <h2 className="text-xl font-semibold mb-6">{title}</h2>
+const RxTable = ({ title, prefix, form, onChange }) => {
+  const fields = [
+    { key: "spherical", label: "Sph", fullLabel: "Spherical" },
+    { key: "cylindrical", label: "Cyl", fullLabel: "Cylindrical" },
+    { key: "axis", label: "Axis", fullLabel: "Axis" },
+    { key: "pupilDistance", label: "PD", fullLabel: "Pupil Distance" },
+    { key: "addPower", label: "Add", fullLabel: "Add Power" },
+  ];
 
-    <table className="min-w-[720px] w-full text-sm">
-      <thead className="text-gray-400">
-        <tr>
-          <th className="text-left">Eye</th>
-          <th>Spherical</th>
-          <th>Cylindrical</th>
-          <th>Axis</th>
-          <th>PD</th>
-          <th>Add</th>
-        </tr>
-      </thead>
+  return (
+    <div className="rounded-2xl sm:rounded-[28px] border border-white/10 bg-white/[0.04] backdrop-blur-xl p-4 sm:p-5 lg:p-6 overflow-hidden">
+      <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">{title}</h2>
 
-      <tbody>
+      {/* Desktop Table View */}
+      <div className="hidden lg:block overflow-x-auto">
+        <table className="min-w-[720px] w-full text-sm">
+          <thead className="text-gray-400">
+            <tr>
+              <th className="text-left pb-3">Eye</th>
+              {fields.map((f) => (
+                <th key={f.key} className="pb-3">{f.fullLabel}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {["L", "R"].map((eye) => (
+              <tr key={eye} className="border-t border-white/10">
+                <td className="py-3 font-medium">
+                  {eye === "L" ? "Left" : "Right"}
+                </td>
+                {fields.map((field) => (
+                  <td key={field.key} className="px-1">
+                    <input
+                      type="number"
+                      step="0.25"
+                      min={-10}
+                      max={10}
+                      name={`${field.key}${eye}${prefix}`}
+                      value={form[`${field.key}${eye}${prefix}`]}
+                      onChange={onChange}
+                      className="w-full px-3 py-2 rounded-lg
+                      bg-black/40 border border-white/10 text-center
+                      focus:outline-none focus:ring-2 focus:ring-emerald-600/40"
+                    />
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+
+      <div className="lg:hidden space-y-4">
         {["L", "R"].map((eye) => (
-          <tr key={eye} className="border-t border-white/10">
-            <td className="py-3 font-medium">
-              {eye === "L" ? "Left" : "Right"}
-            </td>
-
-            {["spherical", "cylindrical", "axis", "pupilDistance", "addPower"].map(
-              (field) => (
-                <td key={field} className="px-1">
+          <div key={eye} className="rounded-xl border border-white/10 bg-black/20 p-4">
+            <h3 className="font-semibold mb-3 text-base">
+              {eye === "L" ? "Left Eye" : "Right Eye"}
+            </h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {fields.map((field) => (
+                <div key={field.key}>
+                  <label className="block text-xs text-gray-400 mb-1.5">
+                    {field.label}
+                  </label>
                   <input
                     type="number"
                     step="0.25"
                     min={-10}
                     max={10}
-                    name={`${field}${eye}${prefix}`}
-                    value={form[`${field}${eye}${prefix}`]}
+                    name={`${field.key}${eye}${prefix}`}
+                    value={form[`${field.key}${eye}${prefix}`]}
                     onChange={onChange}
-                    className="w-full px-3 py-2 rounded-lg
-                    bg-black/40 border border-white/10
+                    className="w-full px-3 py-2 rounded-lg text-sm
+                    bg-black/40 border border-white/10 text-center
                     focus:outline-none focus:ring-2 focus:ring-emerald-600/40"
                   />
-                </td>
-              )
-            )}
-          </tr>
+                </div>
+              ))}
+            </div>
+          </div>
         ))}
-      </tbody>
-    </table>
-  </div>
-);
+      </div>
+    </div>
+  );
+};
