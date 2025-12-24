@@ -1,45 +1,8 @@
-// import axios from "axios";
-
-// const api = axios.create({
-//   baseURL: import.meta.env.VITE_BASE_URL,
-//   withCredentials: true, 
-// });
-
-// export default api;
-
-
-
-// debuing process
-
 import axios from "axios";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
+  withCredentials: true, 
 });
-
-
-api.interceptors.request.use(
-  
-  (config) => {
-    console.log("🔥 AXIOS INSTANCE WITH INTERCEPTOR LOADED");
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem("accessToken");
-    }
-    return Promise.reject(error);
-  }
-);
 
 export default api;
