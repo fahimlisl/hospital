@@ -9,20 +9,26 @@ const Home = () => {
   return (
     <div className="relative min-h-screen bg-[#020617] overflow-hidden">
 
-      <div className="absolute inset-0 opacity-[0.04]
+      {/* ===== Subtle Grid ===== */}
+      <div
+        className="absolute inset-0 opacity-[0.04]
         bg-[linear-gradient(to_right,white_1px,transparent_1px),
         linear-gradient(to_bottom,white_1px,transparent_1px)]
-        bg-[size:48px_48px]" />
+        bg-[size:48px_48px]"
+      />
 
+      {/* ===== Ambient Glows ===== */}
       <div className="absolute -top-1/3 -left-1/3 w-[900px] h-[900px] bg-blue-600/25 blur-[200px]" />
       <div className="absolute -bottom-1/3 -right-1/3 w-[900px] h-[900px] bg-indigo-600/25 blur-[200px]" />
       <div className="absolute top-1/4 right-1/4 w-[400px] h-[400px] bg-emerald-500/20 blur-[160px]" />
 
+      {/* ===== Main Content ===== */}
       <div className="relative z-10 min-h-screen flex items-center justify-center px-6">
         <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
 
+          {/* ================= LEFT ================= */}
           <div className="text-center lg:text-left">
-            <span className="inline-block mb-5 text-[11px] tracking-[0.45em] uppercase text-blue-400">
+            <span className="inline-block mb-6 text-[11px] tracking-[0.45em] uppercase text-blue-400">
               Hospital Management Platform
             </span>
 
@@ -34,13 +40,22 @@ const Home = () => {
               </span>
             </h1>
 
-            <p className="mt-6 text-gray-400 text-base sm:text-lg max-w-xl mx-auto lg:mx-0 leading-relaxed">
-              A centralized system for managing patients, clinical visits,
-              and medical workflows with enterprise-grade security and
-              role-based access.
+            {/* ===== Founder Line (Stylish & Clean) ===== */}
+            <p className="mt-4 text-xs sm:text-sm tracking-[0.3em] uppercase text-gray-400">
+              Founder ·{" "}
+              <span className="text-gray-200 font-medium tracking-wide">
+                Talib
+              </span>
             </p>
 
-            <div className="hidden lg:flex mt-10 gap-6">
+            <p className="mt-8 text-gray-400 text-base sm:text-lg max-w-xl mx-auto lg:mx-0 leading-relaxed">
+              A centralized system for managing patients, clinical visits,
+              and medical workflows with enterprise-grade security and
+              strict role-based access.
+            </p>
+
+            {/* Desktop CTAs */}
+            <div className="hidden lg:flex mt-12 gap-6">
               <PrimaryCTA
                 to="/admin/login"
                 icon={<ShieldCheck size={18} />}
@@ -57,20 +72,26 @@ const Home = () => {
             </div>
           </div>
 
+          {/* ================= RIGHT ================= */}
           <div className="flex justify-center">
-            <div className="w-full max-w-md rounded-[36px]
+            <div
+              className="w-full max-w-md rounded-[36px]
               border border-white/10 bg-white/[0.035]
               backdrop-blur-2xl p-10
-              shadow-[0_80px_180px_rgba(0,0,0,0.85)]">
+              shadow-[0_80px_180px_rgba(0,0,0,0.85)]"
+            >
 
+              {/* Logo */}
               <div className="flex justify-center mb-8">
                 <div className="relative">
                   <div className="absolute inset-0 blur-xl bg-blue-600/40 rounded-2xl" />
-                  <div className="relative w-16 h-16 rounded-2xl
+                  <div
+                    className="relative w-16 h-16 rounded-2xl
                     bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600
                     flex items-center justify-center
                     text-white font-bold text-xl
-                    shadow-[0_25px_80px_rgba(59,130,246,0.6)]">
+                    shadow-[0_25px_80px_rgba(59,130,246,0.6)]"
+                  >
                     HMS
                   </div>
                 </div>
@@ -84,6 +105,7 @@ const Home = () => {
                 Select your role to continue
               </p>
 
+              {/* Mobile CTAs */}
               <div className="mt-10 space-y-5">
                 <PrimaryCTA
                   to="/admin/login"
@@ -102,8 +124,12 @@ const Home = () => {
                 />
               </div>
 
-              <p className="mt-10 text-center text-[11px] tracking-wide text-gray-500">
-                ROLE-BASED ACCESS · AUDIT READY · MEDICAL-GRADE SECURITY
+              {/* Footer Credit */}
+              <p className="mt-12 text-center text-[11px] tracking-wide text-gray-500">
+                Developed & maintained by{" "}
+                <span className="text-gray-300 font-medium">
+                  Fahim Abdullah
+                </span>
               </p>
             </div>
           </div>
@@ -115,6 +141,10 @@ const Home = () => {
 };
 
 export default Home;
+
+/* =====================================================
+   CTA COMPONENTS
+===================================================== */
 
 const PrimaryCTA = ({ to, icon, label, gradient, full }) => (
   <Link
