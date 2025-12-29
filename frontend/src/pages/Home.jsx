@@ -44,7 +44,7 @@ const Home = () => {
             <p className="mt-4 text-xs sm:text-sm tracking-[0.3em] uppercase text-gray-400">
               Founder ·{" "}
               <span className="text-gray-200 font-medium tracking-wide">
-                Talib
+                You
               </span>
             </p>
 
@@ -128,7 +128,7 @@ const Home = () => {
               <p className="mt-12 text-center text-[11px] tracking-wide text-gray-500">
                 Developed & maintained by{" "}
                 <span className="text-gray-300 font-medium">
-                  Fahim Abdullah
+                  <a href="https://fahim.in">Fahim Abdullah</a>
                 </span>
               </p>
             </div>
