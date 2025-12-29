@@ -85,6 +85,7 @@ const addPatient = asyncHandler(async(req,res) => {
         }
     )
 
+    
     if(!updatePatientDocument){
         await Patient.deleteOne({_id : createUser._id})
         await Step.deleteOne({_id : setpP._id})
