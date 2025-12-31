@@ -155,7 +155,7 @@ const Home = () => {
           </span>
 
           <h3 className="mt-6 text-3xl font-semibold">
-            Fahim Abdullah
+            Talib Gazi
           </h3>
 
           <p className="mt-8 text-gray-400 leading-relaxed max-w-3xl mx-auto text-lg">
