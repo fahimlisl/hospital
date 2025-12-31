@@ -39,7 +39,7 @@ const Login = () => {
             <p className="mt-4 text-xs sm:text-sm tracking-[0.3em] uppercase text-gray-400">
               Founder ·{" "}
               <span className="text-gray-200 font-medium tracking-wide">
-                You
+                Talib
               </span>
             </p>
 
