@@ -1,194 +1,200 @@
 import { Link } from "react-router-dom";
 import {
+  Eye,
   ShieldCheck,
   Stethoscope,
   ArrowRight,
+  ScanEye,
+  HeartPulse,
+  Sparkles,
 } from "lucide-react";
 
 const Home = () => {
   return (
-    <div className="relative min-h-screen bg-[#020617] overflow-hidden">
+    <div className="bg-[#020617] text-white overflow-hidden">
 
-      {/* ===== Subtle Grid ===== */}
-      <div
-        className="absolute inset-0 opacity-[0.04]
-        bg-[linear-gradient(to_right,white_1px,transparent_1px),
-        linear-gradient(to_bottom,white_1px,transparent_1px)]
-        bg-[size:48px_48px]"
-      />
+      <header className="fixed top-0 left-0 w-full z-50">
+        <div className="backdrop-blur-xl bg-black/40 border-b border-white/10">
+          <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <Eye className="text-blue-400" />
+              <span className="font-semibold tracking-wide">
+                J Q Hospital
+              </span>
+            </div>
 
-      {/* ===== Ambient Glows ===== */}
-      <div className="absolute -top-1/3 -left-1/3 w-[900px] h-[900px] bg-blue-600/25 blur-[200px]" />
-      <div className="absolute -bottom-1/3 -right-1/3 w-[900px] h-[900px] bg-indigo-600/25 blur-[200px]" />
-      <div className="absolute top-1/4 right-1/4 w-[400px] h-[400px] bg-emerald-500/20 blur-[160px]" />
+            <div className="hidden md:flex items-center gap-10 text-sm text-gray-300">
+              <a href="#vision" className="hover:text-white transition">
+                Vision
+              </a>
+              <a href="#services" className="hover:text-white transition">
+                Services
+              </a>
+              <a href="#founder" className="hover:text-white transition">
+                Founder
+              </a>
+              <Link
+                to="/login"
+                className="px-6 py-2.5 rounded-xl bg-blue-600 text-white
+                hover:bg-blue-700 transition shadow-lg"
+              >
+                Login
+              </Link>
+            </div>
+          </div>
+        </div>
+      </header>
 
-      {/* ===== Main Content ===== */}
-      <div className="relative z-10 min-h-screen flex items-center justify-center px-6">
-        <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
+      <section className="relative min-h-screen flex items-center pt-32">
+        <div className="absolute inset-0">
+          <div className="absolute -top-1/2 -left-1/2 w-[1000px] h-[1000px] bg-blue-600/20 blur-[220px]" />
+          <div className="absolute -bottom-1/2 -right-1/2 w-[1000px] h-[1000px] bg-indigo-600/20 blur-[220px]" />
+          <div className="absolute inset-0 opacity-[0.03]
+            bg-[linear-gradient(to_right,white_1px,transparent_1px),
+            linear-gradient(to_bottom,white_1px,transparent_1px)]
+            bg-[size:48px_48px]"
+          />
+        </div>
 
-          {/* ================= LEFT ================= */}
-          <div className="text-center lg:text-left">
-            <span className="inline-block mb-6 text-[11px] tracking-[0.45em] uppercase text-blue-400">
-              Hospital Management Platform
+        <div className="relative z-10 max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+
+          <div>
+            <span className="inline-flex items-center gap-2 mb-6
+              text-xs tracking-[0.45em] uppercase text-blue-400">
+              <Sparkles size={14} />
+              Advanced Eye Hospital
             </span>
 
-            <h1 className="text-4xl sm:text-5xl xl:text-6xl font-semibold tracking-tight text-white leading-tight">
-              Clinical Operations
+            <h1 className="text-4xl sm:text-5xl xl:text-6xl font-semibold leading-tight">
+              Redefining
               <br />
               <span className="text-blue-400">
-                Simplified & Secured
+                Vision Care
               </span>
             </h1>
 
-            {/* ===== Founder Line (Stylish & Clean) ===== */}
-            <p className="mt-4 text-xs sm:text-sm tracking-[0.3em] uppercase text-gray-400">
-              Founder ·{" "}
-              <span className="text-gray-200 font-medium tracking-wide">
-                You
-              </span>
+            <p className="mt-8 text-gray-400 max-w-xl leading-relaxed text-lg">
+              Precision diagnostics, trusted specialists, and
+              technology-driven care — designed to protect what
+              matters most: <b className="text-gray-200">your vision</b>.
             </p>
 
-            <p className="mt-8 text-gray-400 text-base sm:text-lg max-w-xl mx-auto lg:mx-0 leading-relaxed">
-              A centralized system for managing patients, clinical visits,
-              and medical workflows with enterprise-grade security and
-              strict role-based access.
-            </p>
+            <div className="mt-12 flex flex-wrap gap-5">
+              <Link
+                to="/login"
+                className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl
+                bg-blue-600 hover:bg-blue-700 transition
+                shadow-[0_30px_120px_rgba(59,130,246,0.6)]"
+              >
+                Access Portal
+                <ArrowRight size={18} />
+              </Link>
 
-            {/* Desktop CTAs */}
-            <div className="hidden lg:flex mt-12 gap-6">
-              <PrimaryCTA
-                to="/admin/login"
-                icon={<ShieldCheck size={18} />}
-                label="Admin Console"
-                gradient="from-blue-600 to-indigo-600"
-              />
-
-              <SecondaryCTA
-                to="/doctor/login"
-                icon={<Stethoscope size={18} />}
-                label="Doctor Workspace"
-                gradient="from-emerald-600 to-teal-600"
-              />
+              <a
+                href="#services"
+                className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl
+                bg-white/10 hover:bg-white/20 transition"
+              >
+                Explore Services
+              </a>
             </div>
           </div>
 
-          {/* ================= RIGHT ================= */}
-          <div className="flex justify-center">
-            <div
-              className="w-full max-w-md rounded-[36px]
-              border border-white/10 bg-white/[0.035]
-              backdrop-blur-2xl p-10
-              shadow-[0_80px_180px_rgba(0,0,0,0.85)]"
-            >
+          <div className="relative">
+            <div className="rounded-[36px] bg-white/[0.04]
+              border border-white/10 backdrop-blur-xl p-10">
 
-              {/* Logo */}
-              <div className="flex justify-center mb-8">
-                <div className="relative">
-                  <div className="absolute inset-0 blur-xl bg-blue-600/40 rounded-2xl" />
-                  <div
-                    className="relative w-16 h-16 rounded-2xl
-                    bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600
-                    flex items-center justify-center
-                    text-white font-bold text-xl
-                    shadow-[0_25px_80px_rgba(59,130,246,0.6)]"
-                  >
-                    HMS
-                  </div>
-                </div>
-              </div>
-
-              <h2 className="text-center text-xl font-semibold text-white">
-                Choose Access
-              </h2>
-
-              <p className="text-center text-sm text-gray-400 mt-2">
-                Select your role to continue
-              </p>
-
-              {/* Mobile CTAs */}
-              <div className="mt-10 space-y-5">
-                <PrimaryCTA
-                  to="/admin/login"
-                  icon={<ShieldCheck size={18} />}
-                  label="Continue as Admin"
-                  gradient="from-blue-600 to-indigo-600"
-                  full
+              <div className="grid grid-cols-2 gap-6">
+                <Trust
+                  icon={<ShieldCheck />}
+                  title="Secure Records"
+                  desc="Medical-grade data protection"
                 />
-
-                <SecondaryCTA
-                  to="/doctor/login"
-                  icon={<Stethoscope size={18} />}
-                  label="Continue as Doctor"
-                  gradient="from-emerald-600 to-teal-600"
-                  full
+                <Trust
+                  icon={<Stethoscope />}
+                  title="Expert Doctors"
+                  desc="Certified specialists"
+                />
+                <Trust
+                  icon={<ScanEye />}
+                  title="Advanced Imaging"
+                  desc="Precision diagnostics"
+                />
+                <Trust
+                  icon={<HeartPulse />}
+                  title="Patient First"
+                  desc="Compassion-led care"
                 />
               </div>
-
-              {/* Footer Credit */}
-              <p className="mt-12 text-center text-[11px] tracking-wide text-gray-500">
-                Developed & maintained by{" "}
-                <span className="text-gray-300 font-medium">
-                  <a href="https://fahim.in">Fahim Abdullah</a>
-                </span>
-              </p>
             </div>
           </div>
-
         </div>
-      </div>
+      </section>
+
+      <section id="services" className="py-32">
+        <div className="max-w-7xl mx-auto px-6">
+          <h2 className="text-3xl font-semibold text-center mb-20">
+            Specialized Eye Care Services
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+            <Service title="Comprehensive Eye Exams" />
+            <Service title="Cataract & LASIK Surgery" />
+            <Service title="Retina & Glaucoma Care" />
+            <Service title="Pediatric Ophthalmology" />
+            <Service title="Contact Lens Clinic" />
+            <Service title="Digital Prescriptions" />
+          </div>
+        </div>
+      </section>
+
+      <section id="founder" className="py-32 bg-white/[0.02]">
+        <div className="max-w-5xl mx-auto px-6 text-center">
+          <span className="text-xs tracking-[0.4em] uppercase text-blue-400">
+            Founder
+          </span>
+
+          <h3 className="mt-6 text-3xl font-semibold">
+            Fahim Abdullah
+          </h3>
+
+          <p className="mt-8 text-gray-400 leading-relaxed max-w-3xl mx-auto text-lg">
+            This platform was built with a single philosophy —
+            <b className="text-gray-200"> healthcare systems should empower doctors, not slow them down.</b>
+            Every interaction is designed to reduce friction,
+            increase accuracy, and restore focus where it belongs:
+            patient care.
+          </p>
+        </div>
+      </section>
+
+      <footer className="border-t border-white/10 py-12 text-center text-sm text-gray-500">
+        Developed & maintained by{" "}
+        <span className="text-gray-300 font-medium">
+          <a href="https://fahim.in">Fahim Abdullah</a>
+        </span>
+      </footer>
     </div>
   );
 };
 
 export default Home;
 
-/* =====================================================
-   CTA COMPONENTS
-===================================================== */
 
-const PrimaryCTA = ({ to, icon, label, gradient, full }) => (
-  <Link
-    to={to}
-    className={`group relative inline-flex items-center justify-center gap-3
-    ${full ? "w-full" : ""}
-    px-6 py-4 rounded-2xl
-    bg-gradient-to-r ${gradient}
-    text-white font-medium
-    shadow-[0_30px_100px_rgba(59,130,246,0.55)]
-    hover:shadow-[0_40px_140px_rgba(59,130,246,0.8)]
-    transition`}
-  >
-    {icon}
-    {label}
-    <ArrowRight
-      size={16}
-      className="opacity-70 group-hover:translate-x-1 transition"
-    />
-  </Link>
+const Trust = ({ icon, title, desc }) => (
+  <div className="p-5 rounded-2xl bg-white/5 hover:bg-white/10 transition">
+    <div className="text-blue-400 mb-3">{icon}</div>
+    <h4 className="font-semibold mb-1">{title}</h4>
+    <p className="text-sm text-gray-400">{desc}</p>
+  </div>
 );
 
-const SecondaryCTA = ({ to, icon, label, gradient, full }) => (
-  <Link
-    to={to}
-    className={`group relative inline-flex items-center justify-center gap-3
-    ${full ? "w-full" : ""}
-    px-6 py-4 rounded-2xl
-    bg-white/[0.04] border border-white/10
-    text-white font-medium
-    hover:bg-white/[0.08]
-    transition`}
-  >
-    <span
-      className={`flex items-center gap-3
-      bg-gradient-to-r ${gradient}
-      bg-clip-text text-transparent`}
-    >
-      {icon}
-      {label}
-    </span>
-    <ArrowRight
-      size={16}
-      className="opacity-60 group-hover:translate-x-1 transition"
-    />
-  </Link>
+const Service = ({ title }) => (
+  <div className="p-7 rounded-3xl bg-white/[0.04] border border-white/10
+    hover:bg-white/[0.07] hover:-translate-y-1 transition-all">
+    <h4 className="font-semibold mb-3">{title}</h4>
+    <p className="text-sm text-gray-400">
+      Delivered with precision, care, and modern technology.
+    </p>
+  </div>
 );

@@ -21,6 +21,7 @@ import PrescriptionList from "./pages/doctor/PrescriptionList";
 import AdminLayout from "./layouts/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import DoctorManagement from "./pages/admin/DoctorManagement";
+import Login from "../src/pages/Login.jsx"
 
 const App = () => {
   return (
@@ -30,6 +31,7 @@ const App = () => {
         <Routes>
 
           <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />}/> 
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/doctor/login" element={<DoctorLogin />} />
 
