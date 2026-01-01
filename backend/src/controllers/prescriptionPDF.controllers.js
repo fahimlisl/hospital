@@ -214,8 +214,8 @@ const generatePrescriptionHTML = (prescriptionItem, patientData, index) => {
           <img
   class=logo-placeholder
   src=${logo} />
-          <div class="brand-name">J.Q Hospital</div>
-          <p class="ownerName">By Talib</p>
+          <div class="brand-name">ABC EYE HOSPITAL</div>
+          <p class="ownerName">By ABC YOU</p>
           <h1>Eye Test Prescription</h1>
         </div>
         
@@ -238,7 +238,7 @@ const generatePrescriptionHTML = (prescriptionItem, patientData, index) => {
         <div class="store-info">
           <div class="info-label">Store Address</div>
           <div class="info-value" style="font-size: 14px; font-weight: 400; color: #333;">
-            jqhospital.in, Aligarh
+            abchospital.in, your location
           </div>
         </div>
         

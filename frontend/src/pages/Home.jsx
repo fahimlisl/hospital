@@ -19,7 +19,7 @@ const Home = () => {
             <div className="flex items-center gap-3">
               <Eye className="text-blue-400" />
               <span className="font-semibold tracking-wide">
-                J Q Hospital
+                ABC HOSPITAL
               </span>
             </div>
 
@@ -155,7 +155,7 @@ const Home = () => {
           </span>
 
           <h3 className="mt-6 text-3xl font-semibold">
-            Fahim Abdullah
+            ABC YOU
           </h3>
 
           <p className="mt-8 text-gray-400 leading-relaxed max-w-3xl mx-auto text-lg">
