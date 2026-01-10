@@ -35,7 +35,7 @@ const adminRegister = asyncHandler(async (req, res) => {
 
 const loginAdmin = asyncHandler(async (req, res) => {
   const { email, password, phoneNumber } = req.body;
-  if (!email || !phoneNumber) {
+  if (!(email || phoneNumber)) {
     throw new ApiError(400, "at least one field is required");
   }
 
